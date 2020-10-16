@@ -218,6 +218,62 @@ def binary_search(sorted_list, target):
 	return None
 
 ## Problem 2.3 - Bisection Root Finding
+def bisection_root(f, x_left, x_right, epsilon):
+	"""
+	Bisection method to find a root of a continuous function f.
+
+	The algorithm applies to any continuous function f on an interval x_left to x_right where the value of the function f changes sign from x_left to x_right.
+
+	Args:
+		f (function): Continuous real-valued function of a single real variable
+		x_left (float): Estimated value to the left of the root
+		x_right (float): Estimated value to the right of the root
+		epsilon (float): Tolerance error to find the actual root within
+
+	Returns:
+		float: Root of the function f between the given intervals within tolerance epsilon
+	"""
+	# Make sure x_left and x_right are entered in the right order
+	if x_left > x_right:
+		# Swap them
+		x_left, x_right = x_right, x_left
+
+	# Check if either of the intervals are a zero themselves.
+	if f(x_left) == 0:
+		return x_left
+	elif f(x_right) == 0:
+		return x_right
+	elif f(x_left) * f(x_right) > 0:
+		# If this is True, then the value of the function does not change sign over the interval.
+		# The root finding algorithm is not guaranteed to work. 
+		print("The function does not pass through zero for the given interval.")
+		return None
+
+	num_iterations = 100000
+	for i in range(num_iterations):
+		middle_interval = (x_left + x_right) / 2
+		middle_value = f(middle_interval)
+		if abs(middle_value) <= epsilon:
+			# middle_value is within range of epsilon
+			print(f"Found root in {i+1} iterations.")
+			return middle_interval
+		elif f(x_left) * f(middle_interval) < 0:
+			# f(x_left) and f(middle_interval) have opposite signs. 
+			# There must be a zero between them
+			# Set right value to the middle value
+			x_right = middle_interval
+		elif f(x_right) * f(middle_interval) < 0:
+			# f(x_right) and f(middle_interval) have opposite signs. 
+			# There must be a zero between them
+			# Set left value to the middle value
+			x_left = middle_interval
+		else:
+			# All signs are equal, something went wrong
+			return None
+
+	# Did not find a root within the number of iterations
+	print(f"Did not find a root within {num_iterations} iterations")
+	return middle_interval
 
 ## Problem 2.4 - A Physical Application: Projectile Range Maximization
 
@@ -291,3 +347,19 @@ def prime_factors(n):
 ################################################################################
 
 # Problem Group 4 - weighty problem
+def weight_set(total):
+	"""
+	Inductive approach to solving The Weight Problem of Bachet de Meziriac.
+
+	Args:
+		total (int): Total weight of the initial weight.
+
+	Returns:
+		list: Returns list of pieces that can weigh any integer less than or equal to total.
+	"""
+	pieces = [1]
+
+	while sum(pieces) < total:
+		pieces.append(2 * sum(pieces) + 1)
+
+	return pieces
