@@ -149,8 +149,73 @@ def logistic_gen(n, r, x0):
 # Problem Group 2 - Searching for stuff
 
 ## Problem 2.1 - Linear Search
+def linear_search(l, n):
+	"""
+	Simple lineary search for a list of numbers.
+
+	Args:
+		l (list): List of positive integers
+		n (int): Value to search for
+
+	Returns:
+		int: Returns the index of the first match found, or None if no matches found.
+	"""
+	for i in range(len(l)):
+		if n == l[i]:
+			return i
+	print("The specific number is not in the list.")
+	return None
 
 ## Problem 2.2 - Bisection Search
+def bisection_search(l, n):
+	"""
+	Wrapper for binary_search algorithm.
+
+	Using a simple binary_search algorithm I have written before.
+
+	Args:
+		l (list): Sorted list in ascending order. Elements must be comparable
+		n (float): Value to search for
+
+	Returns:
+		int, None: Returns the index of the first match found, or None if no matches found. 
+	"""
+	index = binary_search(l, n)
+	if index is not None:
+		return index
+	else: 
+		print("The specific number is not in the list.")
+		return None
+
+def binary_search(sorted_list, target):
+	"""
+	Simple Binary Search using pointers. Iterative approach
+
+	Time Complexity: O(n). Space Complexity: O(1)
+
+	Args:
+		sorted_list (list): Sorted list in ascending order. Elements must be comparable. 
+		target (float): Value to search for
+
+	Returns:
+		int, None: Returns the index of the first match found, or None if no matches found. 
+	"""
+	# Set the left pointer to the beginning of the array, and the right pointer to the end of the array.
+	left_pointer = 0
+	right_pointer = len(sorted_list)
+	
+	while left_pointer < right_pointer:
+		# Calculate the middle index using the two pointers
+		middle_index = (right_pointer + left_pointer) // 2
+		middle_value = sorted_list[middle_index]
+		if middle_value == target:
+			return middle_index
+		if target < middle_value:
+			right_pointer = middle_index
+		if target > middle_value:
+			left_pointer = middle_index + 1
+	
+	return None
 
 ## Problem 2.3 - Bisection Root Finding
 
