@@ -34,17 +34,17 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 		
 	S[0] = s_0
 	
-	if method == 'Euler':
+	if method == "Euler":
 		for n in range(N):
 			S[n + 1] = S[n] + h * f(T[n], S[n])
 	
-	if method == 'RK2':
+	if method == "RK2":
 		for n in range(N):
 			k1 = 
 			k2 = 
 			S[n + 1] = 
 	
-	if method == 'RK4':
+	if method == "RK4":
 		for n in range(N):
 			k1 = 
 			k2 = 
@@ -92,12 +92,12 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 	if d > 1:
 		
 	
-	if method == 'Euler':
+	if method == "Euler":
 		for n in range(N):
 			Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n])
 			P[n + 1] = 
 	
-	if method == 'RK2':
+	if method == "RK2":
 		for n in range(N):
 			k1_Q = h * d_pH(Q[n], P[n])
 			k1_P = h * (- d_qH(Q[n], P[n]))
@@ -108,11 +108,11 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 			Q[n + 1] = 
 			P[n + 1] = 
 		
-	if method == 'RK4':
+	if method == "RK4":
 		for n in range(N): 
 			
 		
-	if method == 'SE':
+	if method == "SE":
 		
 	
 	if method == "SV":
