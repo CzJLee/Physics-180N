@@ -1,8 +1,8 @@
 import numpy as np
 
 def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Euler"):
-	
-	""" Solves for dynamics of a given dynamical system
+	"""
+	Solves for dynamics of a given dynamical system
 	
 	- User must specify dimension D of phase space.
 	- Includes Euler, RK2, RK4, that user can choose from using the keyword "method"
@@ -54,9 +54,9 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 			
 	return T, S
 
-def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.1, N = 100, method = "Euler",):
-	
-	""" Solves for dynamics of Hamiltonian system
+def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.1, N = 100, method = "Euler"):
+	"""
+	Solves for dynamics of Hamiltonian system
 	
 	- User must specify dimension d of configuration space.
 	- Includes Euler, RK2, RK4, Symplectic Euler (SE) and Stormer Verlet (SV) 
