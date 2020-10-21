@@ -65,8 +65,8 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 	- Includes Euler, RK2, RK4, Symplectic Euler (SE) and Stormer Verlet (SV) that user can choose from using the keyword "method"
 	
 	Args:
-		d_qH: Partial derivative of the Hamiltonian with respect to coordinates (float for d=1, ndarray for d>1)
-		d_pH: Partial derivative of the Hamiltonian with respect to momenta (float for d=1, ndarray for d>1)
+		d_qH (function(x, p)): Partial derivative of the Hamiltonian with respect to coordinates (float for d=1, ndarray for d>1)
+		d_pH (function(x, p)): Partial derivative of the Hamiltonian with respect to momenta (float for d=1, ndarray for d>1)
 		
 	Kwargs:
 		d: Spatial dimension (int) set to 1 as default
@@ -82,43 +82,62 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 		Q: Numpy array of positions at the times given in T
 		P: Numpy array of momenta at the times given in T
 	"""
-	T = 
 	T = np.array([t_0 + n * h for n in range(N + 1)])
 	
 	if d == 1:
-		P = 
-		Q = 
-		
-		Q[0] = 
-		P[0] =
+		P = np.zeros(N + 1)
+		Q = np.zeros(N + 1)
 	
 	if d > 1:
-		
+		P = np.zeros((N + 1, d))
+		Q = np.zeros((N + 1, d))
 	
+	Q[0] = q_0
+	P[0] = p_0
+
 	if method == "Euler":
 		for n in range(N):
 			Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n])
-			P[n + 1] = 
+			P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
 	
 	if method == "RK2":
 		for n in range(N):
-			k1_Q = h * d_pH(Q[n], P[n])
-			k1_P = h * (- d_qH(Q[n], P[n]))
+			k1_Q =   h * d_pH(Q[n], P[n])
+			k1_P = - h * d_qH(Q[n], P[n])
 			
-			k2_Q = 
-			k2_P = 
+			k2_Q =   h * d_pH(Q[n] + h * k1_Q / 2, P[n] + h * k1_P / 2)
+			k2_P = - h * d_qH(Q[n] + h * k1_Q / 2, P[n] + h * k1_P / 2)
 			
-			Q[n + 1] = 
-			P[n + 1] = 
-		
+			Q[n + 1] = Q[n] + k2_Q
+			P[n + 1] = P[n] + k2_P
+	
 	if method == "RK4":
 		for n in range(N): 
+			k1_Q =   h * d_pH(Q[n], P[n])
+			k1_P = - h * d_qH(Q[n], P[n])
 			
-		
+			k2_Q =   h * d_pH(Q[n] + h * k1_Q / 2, P[n] + h * k1_P / 2)
+			k2_P = - h * d_qH(Q[n] + h * k1_Q / 2, P[n] + h * k1_P / 2)
+
+			k3_Q =   h * d_pH(Q[n] + h * k2_Q / 2, P[n] + h * k2_P / 2)
+			k3_P = - h * d_qH(Q[n] + h * k2_Q / 2, P[n] + h * k2_P / 2)
+
+			k4_Q =   h * d_pH(Q[n] + h * k3_Q, P[n] + h * k3_P)
+			k4_P = - h * d_qH(Q[n] + h * k3_Q, P[n] + h * k3_P)
+			
+			Q[n + 1] = Q[n] + h * (k1_Q + 2*k2_Q + 2*k3_Q + k4_Q) / 6
+			P[n + 1] = P[n] + h * (k1_P + 2*k2_P + 2*k3_P + k4_P) / 6
+	
 	if method == "SE":
-		
+		# Use SE1
+		for n in range(N):
+			P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
+			Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n + 1])
 	
 	if method == "SV":
-		
-		
+		for n in range(N):
+			P_n_plus_one_half = P[n] - (h / 2) * d_qH(Q[n], P[n])
+			Q[n + 1] = Q[n] + h * d_pH(Q[n], P_n_plus_one_half)
+			P[n + 1] = P_n_plus_one_half - (h / 2) * d_qH(Q[n + 1], P[n])
+	
 	return T, Q, P
