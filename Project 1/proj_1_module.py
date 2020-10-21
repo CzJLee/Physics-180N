@@ -33,6 +33,9 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 		S = np.zeros((N + 1, D))
 		
 	S[0] = s_0
+
+	# For a better explanation on how to determine k_n, refer to 
+	# https://en.wikipedia.org/wiki/Runge–Kutta_methods#The_Runge–Kutta_method
 	
 	if method == "Euler":
 		for n in range(N):
@@ -40,17 +43,17 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 	
 	if method == "RK2":
 		for n in range(N):
-			k1 = 
-			k2 = 
-			S[n + 1] = 
+			k1 = h * f(T[n], S[n])
+			k2 = h * f(T[n] + h / 2, S[n] + h * k1 / 2)
+			S[n + 1] = S[n] + k2
 	
 	if method == "RK4":
 		for n in range(N):
-			k1 = 
-			k2 = 
-			k3 = 
-			k4 = 
-			S[n + 1] = 
+			k1 = h * f(T[n], S[n])
+			k2 = h * f(T[n] + h / 2, S[n] + h * k1 / 2)
+			k3 = h * f(T[n] + h / 2, S[n] + h * k2 / 2)
+			k4 = h * f(T[n] + h, S[n] + h * k3)
+			S[n + 1] = S[n] + h * (k1 + 2*k2 + 2*k3 + k4) / 6
 			
 	return T, S
 
