@@ -1,6 +1,6 @@
 import numpy as np
 
-def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Euler"):
+def dynamics_solve(f, d = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Euler"):
 	"""
 	Solves for dynamics of a given dynamical system
 	
@@ -12,7 +12,7 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 		the time derivative of the state at that time.
 		
 	Kwargs:
-		D: Phase space dimension (int) set to 1 as default
+		d: Phase space dimension (int) set to 1 as default
 		t_0: Initial time (float) set to 0.0 as default
 		s_0: Initial state (float for D=1, ndarray for D>1) set to 1.0 as default
 		h: Step size (float) set to 0.1 as default
@@ -26,11 +26,11 @@ def dynamics_solve(f, D = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 	
 	T = np.array([t_0 + n * h for n in range(N + 1)])
 	
-	if D == 1:
+	if d == 1:
 		S = np.zeros(N + 1)
 	
-	if D > 1:
-		S = np.zeros((N + 1, D))
+	if d > 1:
+		S = np.zeros((N + 1, d))
 		
 	S[0] = s_0
 
@@ -62,8 +62,7 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 	Solves for dynamics of Hamiltonian system
 	
 	- User must specify dimension d of configuration space.
-	- Includes Euler, RK2, RK4, Symplectic Euler (SE) and Stormer Verlet (SV) 
-	  that user can choose from using the keyword "method"
+	- Includes Euler, RK2, RK4, Symplectic Euler (SE) and Stormer Verlet (SV) that user can choose from using the keyword "method"
 	
 	Args:
 		d_qH: Partial derivative of the Hamiltonian with respect to coordinates (float for d=1, ndarray for d>1)
@@ -84,6 +83,7 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 		P: Numpy array of momenta at the times given in T
 	"""
 	T = 
+	T = np.array([t_0 + n * h for n in range(N + 1)])
 	
 	if d == 1:
 		P = 
