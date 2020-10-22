@@ -53,7 +53,7 @@ def dynamics_solve(f, d = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100, method = "Eul
 			k2 = h * f(T[n] + h / 2, S[n] + h * k1 / 2)
 			k3 = h * f(T[n] + h / 2, S[n] + h * k2 / 2)
 			k4 = h * f(T[n] + h, S[n] + h * k3)
-			S[n + 1] = S[n] + h * (k1 + 2*k2 + 2*k3 + k4) / 6
+			S[n + 1] = S[n] + (k1 + 2*k2 + 2*k3 + k4) / 6
 			
 	return T, S
 
