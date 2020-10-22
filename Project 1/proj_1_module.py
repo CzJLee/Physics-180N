@@ -125,8 +125,8 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 			k4_Q =   h * d_pH(Q[n] + h * k3_Q, P[n] + h * k3_P)
 			k4_P = - h * d_qH(Q[n] + h * k3_Q, P[n] + h * k3_P)
 			
-			Q[n + 1] = Q[n] + h * (k1_Q + 2*k2_Q + 2*k3_Q + k4_Q) / 6
-			P[n + 1] = P[n] + h * (k1_P + 2*k2_P + 2*k3_P + k4_P) / 6
+			Q[n + 1] = Q[n] + (k1_Q + 2*k2_Q + 2*k3_Q + k4_Q) / 6
+			P[n + 1] = P[n] + (k1_P + 2*k2_P + 2*k3_P + k4_P) / 6
 	
 	if method == "SE":
 		# Use SE1
