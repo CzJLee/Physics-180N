@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from proj_1_module import dynamics_solve, hamiltonian_solve
 
-def exact_sol(b, d):
+def population_model_exact_sol(b, d):
 	return lambda p0, t: p0 * math.exp((b - d) * t)
 
-def population_model(b, d):
+def population_model_veloc_function(b, d):
 	return lambda t, s: (b - d) * s
 
 def exact_solve(f, d = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100):
@@ -25,11 +25,23 @@ def exact_solve(f, d = 1, t_0 = 0.0, s_0 = 1, h = 0.1, N = 100):
 	
 	return T, S
 
-p = exact_sol(1.1, 1)
-t, s = exact_solve(p)
+b = 2
+d = 1
+step_size = 0.1
+n = 100
 
-print(np.shape(t))
-print(np.shape(s))
+p_exact = population_model_exact_sol(b, d)
+t_exact, s_exact = exact_solve(p_exact, h = step_size, N = n)
 
-plt.plot(t, s)
+p_model = population_model_veloc_function(b, d)
+t_1, s_1 = dynamics_solve(p_model, h = step_size, N = n, method = "Euler")
+
+t_2, s_2 = dynamics_solve(p_model, h = step_size, N = n, method = "RK2")
+
+t_4, s_4 = dynamics_solve(p_model, h = step_size, N = n, method = "RK4")
+
+plt.plot(t_1, s_1, color = "blue")
+plt.plot(t_2, s_2, color = "green")
+plt.plot(t_4, s_4, color = "orange")
+plt.plot(t_exact, s_exact, color = "red", linestyle = "--")
 plt.show()
