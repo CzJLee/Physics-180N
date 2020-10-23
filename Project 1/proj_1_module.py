@@ -133,7 +133,7 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 		for n in range(N):
 			P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
 			Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n + 1])
-	
+			
 	if method == "SV":
 		for n in range(N):
 			P_n_plus_one_half = P[n] - (h / 2) * d_qH(Q[n], P[n])
