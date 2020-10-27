@@ -70,18 +70,3 @@ def hamiltonian_exact_solve(x, p, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 		P[n] = p(q_0, p_0, t_0, T[n])
 	
 	return T, Q, P
-
-
-m, w = 1, 1
-d_qH, d_pH = harmonic_oscillator_d_hamiltonian(m, w)
-h = 0.01
-N = int(100/h)
-
-x_t, p_t = harmonic_oscillator_exact_sol(m, w)
-t_exact, x_exact, p_exact = hamiltonian_exact_solve(x_t, p_t, h = h, N = N)
-
-t, q, p = hamiltonian_solve(d_qH, d_pH, h = h, N = N, method="Euler")
-
-plt.plot(t, q)
-plt.plot(t_exact, x_exact, color = "red", linestyle = "--")
-plt.show()

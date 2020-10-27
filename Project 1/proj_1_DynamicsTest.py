@@ -60,24 +60,3 @@ def dynamics_exact_solve(f, d = 1, t_0 = 0.0, s_0 = 1.0, h = 0.1, N = 100):
 		S[n] = f(s_0, t_0, T[n])
 	
 	return T, S
-
-b = 2
-d = 1
-step_size = 0.1
-n = 100
-
-p_exact = population_model_exact_sol(b, d)
-t_exact, s_exact = dynamics_exact_solve(p_exact, h = step_size, N = n)
-
-p_model = population_model_veloc_function(b, d)
-t_1, s_1 = dynamics_solve(p_model, h = step_size, N = n, method = "Euler")
-
-t_2, s_2 = dynamics_solve(p_model, h = step_size, N = n, method = "RK2")
-
-t_4, s_4 = dynamics_solve(p_model, h = step_size, N = n, method = "RK4")
-
-plt.plot(t_1, s_1, color = "blue")
-plt.plot(t_2, s_2, color = "green")
-plt.plot(t_4, s_4, color = "orange")
-plt.plot(t_exact, s_exact, color = "red", linestyle = "--")
-plt.show()
