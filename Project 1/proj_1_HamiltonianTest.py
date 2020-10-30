@@ -70,3 +70,83 @@ def hamiltonian_exact_solve(x, p, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 		P[n] = p(q_0, p_0, t_0, T[n])
 	
 	return T, Q, P
+
+def hamiltonian_display_step_size_plot(method, step_size = [0.10, 0.08, 0.06, 0.04, 0.02, 0.01]):
+	# Define Constants
+	m, w = 1, 1
+	t_total = 10 * 2 * math.pi
+	colors = ["#0000FF", "#0040C0", "#008080", "#00C040", "#00FF00", "#00FF00"]
+
+	# Create numpy arrays containing the exact solutions
+	x_t, p_t = harmonic_oscillator_exact_sol(m, w)
+	t_exact, x_exact, p_exact = hamiltonian_exact_solve(x_t, p_t, N = int(t_total / 0.1))
+
+	# Define the Hamiltonian partial derivatives model velocity function
+	d_qH, d_pH = harmonic_oscillator_d_hamiltonian(m, w)
+
+	# Create numpy arrays containing numerical solutions for different step sizes. 
+	t_sol = {}
+	q_sol = {}
+	p_sol = {}
+	for h in step_size:
+		t, q, p = hamiltonian_solve(d_qH, d_pH, h = h, N = int(t_total / h), method = method)
+		t_sol[h] = t
+		q_sol[h] = q
+		p_sol[h] = p
+
+	# Plot all of the numerical model solutions
+	for i, h in enumerate(step_size):
+		plt.plot(t_sol[h], q_sol[h], color = colors[i])
+
+	# Plot exact solution
+	plt.plot(t_exact, x_exact, color = "red", linestyle = "--")
+
+	# Define Labels
+	plt.xlabel('Time')
+	plt.ylabel('Position')
+	plt.title('Position vs. Time for Different Step Sizes')
+
+	# Display Plot
+	plt.show()
+
+def hamiltonian_display_plot(methods, step_size, t_total = None):
+	# Define Constants
+	m, w = 1, 1
+	if t_total is None:
+		t_total = 10 * 2 * math.pi
+	if isinstance(step_size, float) or isinstance(step_size, int):
+		step_size = [step_size for i in range(len(methods))]
+
+	# Create numpy arrays containing the exact solutions
+	x_t, p_t = harmonic_oscillator_exact_sol(m, w)
+	t_exact, x_exact, p_exact = hamiltonian_exact_solve(x_t, p_t, N = int(t_total / 0.1))
+
+	# Define the Hamiltonian partial derivatives model velocity function
+	d_qH, d_pH = harmonic_oscillator_d_hamiltonian(m, w)
+	
+	# Create numpy arrays containing numerical solutions for different methods. 
+	t_sol = {}
+	q_sol = {}
+	p_sol = {}
+	for i, method in enumerate(methods):
+		h = step_size[i]
+		t, q, p = hamiltonian_solve(d_qH, d_pH, h = h, N = int(t_total / h), method = method)
+		t_sol[method] = t
+		q_sol[method] = q
+		p_sol[method] = p
+
+	# Plot all of the numerical model solutions
+	for method in methods:
+		plt.plot(t_sol[method], q_sol[method])
+
+	# Plot exact solution
+	plt.plot(t_exact, x_exact, color = "red", linestyle = "--")
+
+	# Define Labels
+	plt.xlabel('Time')
+	plt.ylabel('Position')
+	plt.title('Position vs. Time for Different Methods')
+
+	# Display Plot
+	plt.show()
+	
