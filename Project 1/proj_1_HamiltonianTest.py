@@ -150,3 +150,10 @@ def hamiltonian_display_plot(methods, step_size, t_total = None):
 	# Display Plot
 	plt.show()
 	
+
+q_0 = 1
+p_0 = 0
+d_qH, d_pH = harmonic_oscillator_d_hamiltonian(1, 1)
+
+print(d_qH(q_0, p_0))
+print(d_pH(q_0, p_0))
