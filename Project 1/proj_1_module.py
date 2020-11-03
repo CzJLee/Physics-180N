@@ -57,7 +57,7 @@ def dynamics_solve(f, d = 1, t_0 = 0.0, s_0 = 1.0, h = 0.1, N = 100, method = "E
 			
 	return T, S
 
-def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.1, N = 100, method = "Euler"):
+def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.1, N = 100, method = "Euler", verbose = False):
 	"""
 	Solves for dynamics of Hamiltonian system
 	
@@ -130,9 +130,16 @@ def hamiltonian_solve(d_qH, d_pH, d = 1, t_0 = 0.0, q_0 = 0.0, p_0 = 1.0, h = 0.
 	
 	if method == "SE":
 		# Use SE1
-		for n in range(N):
-			P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
-			Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n + 1])
+		if verbose:
+			for n in range(N):
+				print(f"Calculating... {round(100*n/N, 2)}%", end = "\r")
+				P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
+				Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n + 1])
+			print()
+		else: 
+			for n in range(N):
+				P[n + 1] = P[n] - h * d_qH(Q[n], P[n])
+				Q[n + 1] = Q[n] + h * d_pH(Q[n], P[n + 1])
 
 	if method == "SV":
 		for n in range(N):
