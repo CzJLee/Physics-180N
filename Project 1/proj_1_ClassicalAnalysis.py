@@ -20,35 +20,84 @@ def kepler_d_hamiltonian(m_1, m_2):
 	
 	# Gravitational Constant
 	g = 6.67408e-11
-	# g = 0.0001
 	k = g * m_1 * m_2
 
 	return lambda x, p: np.array([k * x[0] / ((x[0] ** 2 + x[1] ** 2) ** 1.5), k * x[1] / ((x[0] ** 2 + x[1] ** 2) ** 1.5)]), lambda x, p: p / m, m, k
 
-# Define using earth masses
-m_sun = 1.989e30
-m_earth = 5.972e24
-d_qH, d_pH, m, k = kepler_d_hamiltonian(m_sun, m_earth)
+def plot_orbit(m_1, m_2, q_0, p_0, h = 86400, N = 365, method = "SE", display_plot = True, verbose = False):
+	"""
+	Return coordinate solutions for the given parameters, and plots the solution.
 
-# Set initial conditions
-# Consider coordinates at Aphelion
-# https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
-q_0 = np.array([152.10e9, 0])
-p_0 = np.array([0, 29290 * m])
+	Args:
+		m_1 (float): Mass 1
+		m_2 (float): Mass 2
+		q_0 (numpy array): Initial Position
+		p_0 (numpy array): Initial Momentum
+		h (int, optional): Step Size. Defaults to 86400.
+		N (int, optional): Number of steps. Defaults to 365.
+		method (str, optional): Numerical solution method to use. Defaults to "SE".
+		display_plot (bool, optional): Display the plot of the orbit. Defaults to True.
 
-# Verify elliptical motion
-energy = (p_0[0] ** 2 + p_0[1] ** 2) / (2 * m) - k / ((q_0[0] ** 2 + q_0[1] ** 2) ** 0.5)
-print(f"Energy is : {energy}")
-l = 152.10e9 * 29290 * m
-eccentricity = (1 + (2 * energy * l ** 2)/(m * k ** 2)) ** 0.5
-print(f"Eccentricity is : {eccentricity}")
+	Returns:
+		(numpy array, numpy array): Return the x and y coordinate solutions.
+	"""
+	d_qH, d_pH, m, k = kepler_d_hamiltonian(m_1, m_2)
 
-t, q, p = hamiltonian_solve(d_qH, d_pH, d = 2, t_0 = 0.0, q_0 = q_0, p_0 = p_0, h = 1000, N = 1000000, method = "Euler")
+	# Solve system
+	t, q, p = hamiltonian_solve(d_qH, d_pH, d = 2, t_0 = 0.0, q_0 = q_0, p_0 = p_0, h = h, N = N, method = method, verbose = verbose)
 
-r_earth = (- m_sun / (m_earth + m_sun)) * q
+	# Unpack (x, y) coordinates to be plotted using matplotlib
+	x, y = q.T
+	px, py = p.T
 
-# Unpack (x, y) coordinates to be plotted using matplotlib
-x, y = r_earth.T
+	# Plot
+	if display_plot:
+		plt.plot(x, y)
+		plt.show()
 
-plt.plot(x, y)
-plt.show()
+	# Return coordinate points
+	return x, y, px, py
+
+def find_major_axis(m_1, m_2, q_0, p_0, h = 86400, N = 365):
+	"""
+	Determine the period of orbit and semi major axis distance for a set of coordinate solutions.
+
+	Args:
+		m_1 (float): Mass 1
+		m_2 (float): Mass 2
+		q_0 (numpy array): Initial Position, Expect q_0 = (q_0, 0) where q_0 is positive.
+		p_0 (numpy array): Initial Momentum, Expect p_0 = (0, p_0), where p_0 is positive.
+		h (int, optional): Step Size. Defaults to 86400.
+		N (int, optional): Number of steps. Defaults to 365.
+
+	Returns:
+		(float, float): Return the period as the number of steps, and the semi major axis distance. 
+	"""
+	# Expect q_0 = (q_0, 0), p_0 = (0, p_0), where q_0 and p_0 are both positive. If this is not the case, this function may return bogus. 
+	x, y, *p = plot_orbit(m_1, m_2, q_0, p_0, h = h, N = N, method = "SE", display_plot = False)
+
+	major_axis = None
+	full_orbit = None
+	for i in range(1, len(x)):
+		if y[i] <= 0:
+			# Coordinate has completed first half of orbit. 
+			major_axis = i
+			break
+	for i in range(major_axis + 1, len(x)):
+		if y[i] >= 0:
+			# Coordinate has completed full orbit. 
+			full_orbit = i
+			break
+
+	if major_axis is None:
+		raise Exception("Did not complete half an orbit")
+	elif full_orbit is None:
+		raise Exception("Did not complete full orbit")
+	
+	# Calculate period, in seconds
+	period = full_orbit * h
+
+	# Calculate semi major axis, in meters (or what ever unit q_0 is in.)
+	semi_major_length = (x[0] - x[major_axis]) / 2
+
+	return period, semi_major_length
