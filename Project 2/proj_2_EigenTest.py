@@ -13,11 +13,11 @@ def npprint(a, text = None):
 def gen_rand_herm(dim = 3, eigenvalues = None):
 	if eigenvalues is None:
 		# Generate an array of random integers to use as random eigenvalues
-		# I will sample integers from the range [-100, 101). 
-		eigenvalues = np.random.randint(low = -100, high = 101, size = dim)
+		# I will sample integers from the range [-10, 11). 
+		eigenvalues = np.random.randint(low = -10, high = 11, size = dim)
 
 	# Now make a diagonal matrix with the eigenvalues as its diagonal elements. 
-	a = np.zeros((dim, dim), int)
+	a = np.zeros((dim, dim))
 	np.fill_diagonal(a, eigenvalues)
 
 	# Apply a similarity transformation by a unitary matrix to get a non diagonal matrix with the same eigenvalues
@@ -26,3 +26,6 @@ def gen_rand_herm(dim = 3, eigenvalues = None):
 	a = np.linalg.multi_dot((x, a, x.conj().T))
 
 	return eigenvalues, a
+
+def is_hermitian(h):
+	return np.allclose(h, h.conj().T)
