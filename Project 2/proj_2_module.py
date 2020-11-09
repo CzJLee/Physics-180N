@@ -67,9 +67,9 @@ def jacobi(a, tol = 1.0e-9):
 		# For visual reference, see "rotated_matrix.jpg"
 
 		# (11.1.14) Purple
-		a[p,p] = a[p,p] - t*a[p,q]
+		a[p,p] = a[p,p] - t * a[p,q]
 		# (11.1.15) Pink
-		a[q,q] = a[q,q] + t*a[p,q]
+		a[q,q] = a[q,q] + t * a[p,q]
 		# Apply rotation to make a[p, q] = 0
 		# (11.1.13) Yellow
 		a[p,q] = 0
@@ -82,8 +82,8 @@ def jacobi(a, tol = 1.0e-9):
 			# Orange
 			a_ip = a[i, p]
 			a_iq = a[i, q]
-			a[i, p] = a_ip - s*(a_iq + tau*a_ip)
-			a[i, q] = a_iq + s*(a_ip - tau*a_iq)
+			a[i, p] = a_ip - s * (a_iq + tau * a_ip)
+			a[i, q] = a_iq + s * (a_ip - tau * a_iq)
 		for i in range(p+1, q):
 			# Green
 			a_pi = a[p, i]
@@ -94,8 +94,8 @@ def jacobi(a, tol = 1.0e-9):
 			# Blue
 			a_pi = a[p, i]
 			a_qi = a[q, i]
-			a[p, i] = a_pi - s*(a_qi + tau * a_pi)
-			a[q, i] = a_qi + s*(a_pi - tau * a_qi)
+			a[p, i] = a_pi - s * (a_qi + tau * a_pi)
+			a[q, i] = a_qi + s * (a_pi - tau * a_qi)
 
 		# Update the transformation matrix V
 		# The same equations as (11.1.16) and (11.1.17) are used, and only columns p and q are updated.
@@ -195,6 +195,11 @@ def hermitian_eigensystem(H, tolerance = 1.0e-9):
 	v_real = v[:n, :n]
 	v_imag = v[n:2*n, :n]
 	v = v_real + v_imag * 1.0j
+
+	# I am gonna have to get all hocus pocus on this
+	# There is this weird bug where the Eigenvalues in w are not the same in the upper left as the bottom right. I have no idea why this is the case. But it seems that if I group them all together, and pick one of each, it produces the right set of eigenvalues. So now I need to figure out how to pick the same set of eigenvectors to make this work. 
+
+
 
 	w, v = sort_eigen_pair(w, v)
 
