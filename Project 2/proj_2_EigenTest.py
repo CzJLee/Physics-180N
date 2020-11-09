@@ -28,4 +28,18 @@ def gen_rand_herm(dim = 3, eigenvalues = None):
 	return eigenvalues, a
 
 def is_hermitian(h):
+	# Check if h is hermitian.
 	return np.allclose(h, h.conj().T)
+
+def is_eigenvector(a, l, u):
+	# Return True if l is an eigenvalue and u is an eigenvector within tolerance. 
+	# Verify that A * u = l * u
+	return np.allclose(np.dot(a, u), l * u, rtol=1e-4, atol=1e-7)
+
+def verify_eigenvectors(a, w, v):
+	# Return True if all eigenvectors in v have eigenvalues in w.
+	# Return False if a pair does not match.
+	for i in range(len(a)):
+		if not is_eigenvector(a, w[i], v.T[i]):
+			return False
+	return True

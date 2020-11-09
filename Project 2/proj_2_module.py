@@ -128,6 +128,7 @@ def jacobi(a, tol = 1.0e-9):
 		if a_max < tol: 
 			# diagonal(a) will convert the diagonals into a vector. These will be the eigenvalues. 
 			# V will be the rotation matrix, and its columns will be eigenvectors. 
+			print(f"Completed in {num_rotations} rotations")
 			return np.diagonal(a_copy), v
 		
 		# Rotate the matrix, providing the matrix, p, and the indices of the largest element. 
