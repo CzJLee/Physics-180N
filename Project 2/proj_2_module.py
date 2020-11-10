@@ -125,7 +125,8 @@ def jacobi(a, tol = 1.0e-9):
 		a_max, p, q = max_off_diag(a_copy)
 
 		# If the largest off diag element found is smaller than the tolerance given, then we can say that we are close enough to diagonal and return our current matrix. 
-		if a_max < tol: 
+		# if a_max < tol: 
+		if check_tolerance(a_copy, tol):
 			# diagonal(a) will convert the diagonals into a vector. These will be the eigenvalues. 
 			# V will be the rotation matrix, and its columns will be eigenvectors. 
 			# print(f"Completed in {num_rotations} rotations")
@@ -137,6 +138,40 @@ def jacobi(a, tol = 1.0e-9):
 	
 	# If execution flow reaches this point, matrix a did not diagonalize to the specified tolerance within the maximum number of rotations. 
 	raise Exception(f"Jacobi method did not converge in {max_num_rotations} rotations.")
+
+def check_tolerance(a, tol = 1.0e-9):
+	"""
+	We want to specify a more complex method of checking tolerance.
+
+	Instead of checking if the largest off diagonal element is smaller than the tolerance, we compare the off diagonal elements to the norm. 
+
+	Args:
+		a (Numpy Matrix): Numpy Matrix
+		tol (float): Tolerance
+
+	Returns:
+		bool: Return True if the tolerance is met. 
+	"""
+	# Numpy has a built in method to calculate the Frobenius Norm, however, since we are only updating the upper right triangle of matrix a, it would not return the right result. 
+
+	# Find sum of off diagonals squared. 
+	off = 0
+	n = len(a)
+	for i in range(n-1):
+		for j in range(i+1, n):
+			# Iterate through all off diagonals in upper right triangle 
+			off += a[i, j] ** 2
+	off = 2 * off
+
+	# Find sum of squares of diagonal elements
+	diag = np.sum(np.diagonal(a) ** 2)
+
+	# fnorm is sum of all elements squared
+	fnorm = off + diag
+
+	# Check if sqrt(off) <= tol * sqrt(fnorm)
+	return sqrt(off) <= tol * sqrt(fnorm)
+
 
 def hermitian_matrix_split(h):
 	# I don't know if this method has an official name. 
@@ -186,19 +221,16 @@ def hermitian_eigensystem(H, tolerance = 1.0e-9):
 	"""
 	n = len(H)
 
+	# Split the Hermitian matrix into a real symmetric matrix
 	a = hermitian_matrix_split(H)
 
+	# Apply Jacobi on the real matrix
 	w, v = jacobi(a, tolerance)
 
-	# # Slice w, v
-	# w = w[:n]
-	# v_real = v[:n, :n]
-	# v_imag = v[n:2*n, :n]
-	# v = v_real + v_imag * 1.0j
+	# So it turns out that applying the Jacobi method to diagonalize a matrix will shuffle the order of the eigenvalues. This means that even though matrix a started with separate sections, the result will have a shuffled order. If we consider all of the eigenvalues in w, we see that each eigenvalue has multiplicity of two. So we need to pick one of each. The way that I will do this is to sort them, and then choose every other eigenvalue. 
+	# I also need to find the eigenvectors that correspond to the eigenvalues. I can split the rotation matrix into its four quadrants, recombine them into complex matrices, and then pair them with the eigenvalues. After doing so, I both lists as normal, and choose every other column to be the corresponding eigenvector. 
 
-	# I am gonna have to get all hocus pocus on this
-	# There is this weird bug where the Eigenvalues in w are not the same in the upper left as the bottom right. I have no idea why this is the case. But it seems that if I group them all together, and pick one of each, it produces the right set of eigenvalues. So now I need to figure out how to pick the same set of eigenvectors to make this work. 
-
+	# Split rotation matrix into separate parts. 
 	v_real_left = v[:n, :n]
 	v_imag_left = v[n:2*n, :n]
 	v_left = v_real_left + v_imag_left * 1.0j
@@ -207,13 +239,12 @@ def hermitian_eigensystem(H, tolerance = 1.0e-9):
 	v_imag_right = -v[:n, n:2*n]
 	v_right = v_real_right + v_imag_right * 1.0j
 
+	# Concatenate the two eigenvector matrices to have as many columns as there are eigenvalues in w. 
 	v = np.concatenate((v_left, v_right), axis = 1)
-
 	w, v = sort_eigen_pair(w, v)
 
+	# Choose every other column in the sorted matrices. 
 	w = w[::2]
 	v = v.T[::2].T
 
 	return w, v
-	
-	# return d, U
