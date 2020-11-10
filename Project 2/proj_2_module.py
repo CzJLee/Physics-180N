@@ -128,7 +128,7 @@ def jacobi(a, tol = 1.0e-9):
 		if a_max < tol: 
 			# diagonal(a) will convert the diagonals into a vector. These will be the eigenvalues. 
 			# V will be the rotation matrix, and its columns will be eigenvectors. 
-			print(f"Completed in {num_rotations} rotations")
+			# print(f"Completed in {num_rotations} rotations")
 			return np.diagonal(a_copy), v
 		
 		# Rotate the matrix, providing the matrix, p, and the indices of the largest element. 
@@ -190,18 +190,29 @@ def hermitian_eigensystem(H, tolerance = 1.0e-9):
 
 	w, v = jacobi(a, tolerance)
 
-	# Slice w, v
-	w = w[:n]
-	v_real = v[:n, :n]
-	v_imag = v[n:2*n, :n]
-	v = v_real + v_imag * 1.0j
+	# # Slice w, v
+	# w = w[:n]
+	# v_real = v[:n, :n]
+	# v_imag = v[n:2*n, :n]
+	# v = v_real + v_imag * 1.0j
 
 	# I am gonna have to get all hocus pocus on this
 	# There is this weird bug where the Eigenvalues in w are not the same in the upper left as the bottom right. I have no idea why this is the case. But it seems that if I group them all together, and pick one of each, it produces the right set of eigenvalues. So now I need to figure out how to pick the same set of eigenvectors to make this work. 
 
+	v_real_left = v[:n, :n]
+	v_imag_left = v[n:2*n, :n]
+	v_left = v_real_left + v_imag_left * 1.0j
 
+	v_real_right = v[n:2*n, n:2*n]
+	v_imag_right = -v[:n, n:2*n]
+	v_right = v_real_right + v_imag_right * 1.0j
+
+	v = np.concatenate((v_left, v_right), axis = 1)
 
 	w, v = sort_eigen_pair(w, v)
+
+	w = w[::2]
+	v = v.T[::2].T
 
 	return w, v
 	
