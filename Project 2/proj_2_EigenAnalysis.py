@@ -34,34 +34,60 @@ def psi(v, x):
 
 	return hermval(x, c)
 
-dim = 20
+def plot_eigenfunction(l = 0, energy_level = 0, dim = 30):
+	"""
+	Plot the wave function for the anharmonic oscillator. 
 
-# Create a list of diagonals for H
-h_diag = [m + 0.5 for m in range(1, dim + 1)]
-# Create a matrix of zeros, and fill the diagonals with the diagonal elements. 
-h = np.zeros((dim, dim))
-np.fill_diagonal(h, h_diag)
+	Use the eigenvectors to plot the wave function of the anharmonic oscillator with x^4 perturbation coefficient l at a given energy level. Diagonalize the Hamiltonain matrix to obtain the eigenvectors. 
 
-x = np.zeros((dim, dim))
+	Args:
+		l (float, optional): Lambda in H(lambda) = H + lambda * x^4. Defaults to 0.
+		energy_level (int, optional): Energy Level to plot. Ranges from [0, Infinity). Defaults to 0.
+		dim (int, optional): Dimension of matrix to use. Must be larger than energy_level. Defaults to 30.
+	"""
+	### Create H Matrix ###
+	# Create a list of diagonals for H
+	h_diag = [m + 0.5 for m in range(1, dim + 1)]
+	# Create a matrix of zeros, and fill the diagonals with the diagonal elements. 
+	h = np.zeros((dim, dim))
+	np.fill_diagonal(h, h_diag)
 
-# Iterate over every element in the matrix, and check for deltas = 1.
-for n in range(dim):
-	for m in range(dim):
-		if n == m + 1:
-			x[n, m] = sqrt(m + 1)
-		elif n == m - 1:
-			x[n, m] = sqrt(m)
-			
-x_4 = np.linalg.multi_dot([x, x, x, x])
+	### Create x^4 Matrix ###
+	x = np.zeros((dim, dim))
 
-h_l = h + x_4
+	# Iterate over every element in the matrix, and check for deltas = 1.
+	for n in range(dim):
+		for m in range(dim):
+			if n == m + 1:
+				x[n, m] = sqrt(m + 1)
+			elif n == m - 1:
+				x[n, m] = sqrt(m)
+				
+	x_4 = np.linalg.multi_dot([x, x, x, x])
 
-w, v = np.linalg.eigh(h_l)
-p = []
+	# Check if l and energy_levels are floats or lists. Use lists for multiple overlaid plots. 
+	if not hasattr(l, "__iter__"):
+		l = [l]
+	if not hasattr(energy_level, "__iter__"):
+		energy_level = [energy_level]
 
-x = [i / 100 for i in range(-500, 501)]
-for i, _ in enumerate(x):
-	p.append(psi(v.T[1], x[i]))
+	for i in range(len(l)):
+		### Create H(lambda) Matrix ###
+		# Add to make H(lambda) Matrix
+		h_l = h + l[i] * x_4
 
-plt.plot(x, p)
-plt.show()
+		### Diagonalize Hamiltonain Matrix ###
+		w, v = np.linalg.eigh(h_l)
+
+		### Plot Wavefunction ###
+		p = []
+
+		# Plot from -5 to 5. 
+		x = np.arange(-5, 5, 0.01)
+		for j, _ in enumerate(x):
+			# Use psi function to calculate value at a given point x. 
+			p.append(psi(v.T[energy_level[i]], x[j]))
+
+		plt.plot(x, p)
+	
+	plt.show()
