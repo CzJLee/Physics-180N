@@ -130,6 +130,9 @@ class Ising_2d:
 
 		Args:
 			num_steps (int): Number of spin configurations. num_steps >= 1.
+
+		The info we need is
+		U for each step, M for each step
 		"""
 
 		while num_steps > 0:
@@ -207,6 +210,9 @@ class Ising_2d:
 		
 		# Return negative sum
 		return -total_energy
+
+	def set_E(self):
+		self.E = self.energy()
 	
 	def update_E(self, index):
 		"""
@@ -234,8 +240,8 @@ class Ising_2d:
 			float, float: Energy expectation value. Energy squared expectaton value
 		"""
 		# Based on <O>_n+1 equation in lab proj_3_instructions
-		self.E_exp += (1 / n) * (self.energy(self.H) - self.E_exp)
-		self.E_squared_exp += (1 / n) * ((self.energy(self.H)) ** 2 - self.E_squared_exp)
+		self.E_exp += (1 / n) * (self.E - self.E_exp)
+		self.E_squared_exp += (1 / n) * ((self.E) ** 2 - self.E_squared_exp)
 
 		return self.E_exp, self.E_squared_exp
 
@@ -246,6 +252,9 @@ class Ising_2d:
 		Sum of all spin states in array.
 		"""
 		return np.sum(self.a)
+	
+	def set_S(self):
+		self.S = self.spin()
 
 	def update_S(self, index):
 		"""
@@ -270,8 +279,8 @@ class Ising_2d:
 			float, float: Magnetization expectation value. Magnetization squared expectaton value
 		"""
 		# Based on <O>_n+1 equation in lab proj_3_instructions
-		self.S_exp += (1 / n) * (self.spin() - self.S_exp)
-		self.S_squared_exp += (1 / n) * ((self.spin()) ** 2 - self.S_squared_exp)
+		self.S_exp += (1 / n) * (self.S - self.S_exp)
+		self.S_squared_exp += (1 / n) * ((self.S) ** 2 - self.S_squared_exp)
 
 		return self.S_exp, self.S_squared_exp
 
