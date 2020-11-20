@@ -1,4 +1,4 @@
-from proj_3 import Ising_2d
+from proj_3 import Ising_2d, weighted_die
 import numpy as np
 
 # model = Ising_2d(4, 2)
@@ -6,8 +6,12 @@ import numpy as np
 # print(model)
 # print(model.energy())
 
-l = np.zeros((16, 16))
+# l = np.zeros((16, 16))
 
-a = np.random.randint(16, size = 2)
-print(a)
-print(l[tuple(a)])
+# a = np.random.randint(16, size = 2)
+# print(a)
+# print(l[tuple(a)])
+
+
+w, r = weighted_die(1000000)
+print(w/1000000)
