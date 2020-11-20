@@ -87,7 +87,7 @@ def two_dim_ising(L, temp, num_steps):
 	return blah
 
 class Ising_2d:
-	def __init__(self, L, temp):
+	def __init__(self, L, temp, H = 0):
 		# Critical temperature = 2.2692
 		self.temp_crit = 2 / (math.log(1 + math.sqrt(2)))
 
@@ -98,8 +98,17 @@ class Ising_2d:
 		# Temperature
 		self.T = temp
 
-		# Init lattice matrix. Lets call this a. 
-		self.a = np.zeros((L, L))
+		# External Magnetic Field
+		self.H = H
+
+		# Init lattice matrix. Lets call this a. Set all spins to be aligned. 
+		self.a = np.ones((L, L))
+
+		# Init expectaton values 
+		self.E_exp = 0
+		self.S_exp = 0
+		self.E_squared_exp = 0
+		self.S_squared_exp = 0
 	
 	def __str__(self):
 		return str(self.a)
@@ -195,17 +204,24 @@ class Ising_2d:
 		# Return negative sum
 		return -total_energy
 
-	def energy_exp(self, H = 0):
+	def E(self, H = 0):
+		return self.energy(H)
+
+	def update_E_exp(self, n):
 		"""
-		Energy expectation value.
+		Update energy expectation value.
 
 		Args:
-			H (float, optional): External magnetic field. Defaults to 0.
+			n (int): Current step number.
 
 		Returns:
-			float: Energy expectation value.
+			float, float: Energy expectation value. Energy squared expectaton value
 		"""
-		return self.energy(H) / self.N
+		# Based on <O>_n+1 equation in lab proj_3_instructions
+		self.E_exp += (1 / n) * (self.energy(self.H) - self.E_exp)
+		self.E_squared_exp += (1 / n) * ((self.energy(self.H)) ** 2 - self.E_squared_exp)
+
+		return self.E_exp, self.E_squared_exp
 
 	def S(self):
 		"""
@@ -215,33 +231,45 @@ class Ising_2d:
 		"""
 		return np.sum(self.a)
 
-	def S_exp(self):
+	def update_S_exp(self, n):
 		"""
-		Magnetization expectation value. 
+		Update Magnetization expectation value. 
+
+		Args:
+			n (int): Current step number.
+
+		Returns:
+			float, float: Magnetization expectation value. Magnetization squared expectaton value
 		"""
-		return self.S / self.N
+		# Based on <O>_n+1 equation in lab proj_3_instructions
+		self.S_exp += (1 / n) * (self.S() - self.S_exp)
+		self.S_squared_exp += (1 / n) * ((self.S()) ** 2 - self.S_squared_exp)
+
+		return self.S_exp, self.S_squared_exp
 
 	def U(self):
 		"""
 		Mean Internal Energy
 		"""
-		return self.energy_exp() / self.N
+		return self.E_exp / self.N
 
 	def M(self):
 		"""
 		Magnetization
 		"""
-		return self.S_exp() / self.N
-
-	def C(self):
-		"""
-		Specific Heat
-		"""
-		pass
+		return self.S_exp / self.N
 
 	def MS(self):
 		"""
 		Magnetic Susceptibility
 		"""
-		pass
+		return (self.S_squared_exp - (self.S_exp) ** 2) / (self.N * self.T)
+
+	def C(self):
+		"""
+		Specific Heat
+		"""
+		return (self.E_squared_exp - (self.E_exp) ** 2) / (self.N * (self.T ** 2))
+
+	
 
