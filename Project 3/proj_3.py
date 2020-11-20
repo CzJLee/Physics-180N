@@ -124,16 +124,29 @@ class Ising_2d:
 		# Set a new array with either 1 or -1 by subtracting 2 based on neg_spins. 
 		self.a = np.ones((self.L, self.L)) - 2 * neg_spins
 
-	def mcmcm(self, num_steps):
+	def mcmcm(self, num_steps, calculate = None):
 		"""
 		Metropolis Algorithm for Ising Model on a square lattice.
 
 		Args:
 			num_steps (int): Number of spin configurations. num_steps >= 1.
+			calculate (list): List of values to calculate for each step. Options are "E", "S", "U", "M", "MS", and "C". 
 
-		The info we need is
-		U for each step, M for each step
+		Returns: 
+			dict: Returns a dict with keys as the strings in calculate, and values as a list of values for each step. The list has length num_steps + 1, where the zero'th index is the state before any steps are calculated. 
 		"""
+
+		if calculate is not None:
+			if isinstance(calculate, str):
+				# If calculate is only one string instead of a list, convert that one item to a list of length 1. 
+				calculate = [calculate]
+
+			# Eliminate items in calculate that are not valid options
+			valid_items = []
+			for item in calculate:
+				if item in {"E", "S", "U", "M", "MS", "C"}:
+					valid_items.append(item)
+			calculate = valid_items
 
 		while num_steps > 0:
 			# Pick a random site i on the 2D lattice and compute the energy change 𝚫E due to the change of sign in s_i
