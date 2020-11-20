@@ -105,7 +105,7 @@ class Ising_2d:
 		self.a = np.ones((L, L))
 
 		# Init Energy (E) and Net Magnetization (S)
-		self.E = self.energy(self.H)
+		self.E = self.energy()
 		self.S = self.spin()
 
 		# Init expectaton values 
@@ -124,7 +124,7 @@ class Ising_2d:
 		# Set a new array with either 1 or -1 by subtracting 2 based on neg_spins. 
 		self.a = np.ones((self.L, self.L)) - 2 * neg_spins
 
-	def mcmcm(self, num_steps, H = 0):
+	def mcmcm(self, num_steps):
 		"""
 		Metropolis Algorithm for Ising Model on a square lattice.
 
@@ -135,7 +135,7 @@ class Ising_2d:
 		while num_steps > 0:
 			# Pick a random site i on the 2D lattice and compute the energy change 𝚫E due to the change of sign in s_i
 			rand_site = tuple(np.random.randint(self.L, size = 2))
-			del_energy = H
+			del_energy = self.H
 			for nn_index in self.nn(rand_site):
 				del_energy += self.a[nn_index]
 			del_energy *= 2 * self.a[rand_site]
@@ -183,7 +183,7 @@ class Ising_2d:
 		# Return indices in order top, right, bottom, left
 		return top, right, bottom, left
 
-	def energy(self, H = 0):
+	def energy(self):
 		# H is the external magnetic field.
 		# For this lab, we assume H = 0.
 
@@ -202,20 +202,20 @@ class Ising_2d:
 					total_energy += self.a[i, j] * self.a[nn_index]
 
 		# Add the external magnetic field influence 
-		if H:
-			total_energy += H * np.sum(self.a)
+		if self.H:
+			total_energy += self.H * np.sum(self.a)
 		
 		# Return negative sum
 		return -total_energy
 	
-	def update_E(self, index, H = 0):
+	def update_E(self, index):
 		"""
 		Update self.E by applying 𝚫E
 
 		Returns:
 			float: Energy.
 		"""
-		del_energy = H
+		del_energy = self.H
 		for nn_index in self.nn(index):
 			del_energy += self.a[nn_index]
 		del_energy *= 2 * self.a[index]
