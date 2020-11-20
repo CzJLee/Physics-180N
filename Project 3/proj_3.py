@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import math
 
 def weighted_die(num_steps):
 	"""
@@ -69,3 +70,178 @@ def weighted_die(num_steps):
 		num_steps -= 1
 
 	return winnings, results
+
+def two_dim_ising(L, temp, num_steps):
+	"""
+	Simulate the 2-d ising model on a square, periodic lattice of a specified side length L.
+
+	Args:
+		L (int): Side length of lattice. Number of spins.
+		temp (float): Temperature of the lattice.
+		num_steps (int): Number of MCMC steps to perform
+
+	Returns:
+		[type]: [description]
+	"""
+
+	return blah
+
+class Ising_2d:
+	def __init__(self, L, temp):
+		# Critical temperature = 2.2692
+		self.temp_crit = 2 / (math.log(1 + math.sqrt(2)))
+
+		# Side length of lattice.
+		self.L = L
+		self.N = L ** 2
+
+		# Temperature
+		self.T = temp
+
+		# Init lattice matrix. Lets call this a. 
+		self.a = np.zeros((L, L))
+	
+	def __str__(self):
+		return str(self.a)
+
+	def set_rand_state(self):
+		# Fill the lattice matrix with +1 or -1 spin states randomly with a uniform bias. 
+		# Fill an LxL array with 0s and 1s. 
+		neg_spins = np.random.randint(2, size = (self.L, self.L))
+		# Set a new array with either 1 or -1 by subtracting 2 based on neg_spins. 
+		self.a = np.ones((self.L, self.L)) - 2 * neg_spins
+
+	def mcmcm(self, num_steps, H = 0):
+		"""
+		Metropolis Algorithm for Ising Model on a square lattice.
+
+		Args:
+			num_steps (int): Number of spin configurations. num_steps >= 1.
+		"""
+
+		while num_steps > 0:
+			# Pick a random site i on the 2D lattice and compute the energy change 𝚫E due to the change of sign in s_i
+			rand_site = tuple(np.random.randint(self.L, size = 2))
+			del_energy = H
+			for nn_index in self.nn(rand_site):
+				del_energy += self.a[nn_index]
+			del_energy *= 2 * self.a[rand_site]
+
+			# If 𝚫E <= 0 then accept the move. Else, accept the move with probability A = exp(-𝚫E/T)
+			if del_energy <= 0:
+				# Spin flip accepted, flip spin of rand_site
+				self.a[rand_site] = -1 * self.a[rand_site]
+			else:
+				# Accept the move with probability A = exp(-𝚫E/T)
+				P_A = math.exp(-del_energy / self.T)
+				# Generate a random float [0, 1)
+				if random.random() < P_A:
+					# Spin flip accepted, flip spin of rand_site
+					self.a[rand_site] = -1 * self.a[rand_site]
+				else:
+					# Spin flip is rejected, nothing changes. 
+					pass
+
+			num_steps -= 1
+
+		# return ??? Idk what I am supposed to return here. A list of spins flipped? 
+
+	# Use class methods to calculate values
+
+	def nn(self, index):
+		"""
+		Return list of nearest neighbor indices of index
+
+		Args:
+			index (list): Expect list of form [a, b] which are indices of an element in self.a
+
+		Returns:
+			list: Return the list of four nearest neighbor indices. Top, Right, Bottom, Left.
+		"""
+		# Unpack indices to make my life easier. 
+		a, b = index
+
+		# Since nearest neighbors wrap around to other side of array, use mod to calculate wrapped values
+		top = ((a - 1)%self.L, b)
+		bottom = ((a + 1)%self.L, b)
+		right = (a, (b + 1)%self.L)
+		left = (a, (b - 1)%self.L)
+
+		# Return indices in order top, right, bottom, left
+		return top, right, bottom, left
+
+	def energy(self, H = 0):
+		# H is the external magnetic field.
+		# For this lab, we assume H = 0.
+
+		# The energy is the negative sum of all nearest neighbor products. 
+		# i.e. for every element s_i, 
+		# sum: s_i * s_i_right + s_i * s_i_left + s_i * s_i_top + s_i * s_i_bottom
+		# Where s_i_right is the right neighbor of s_i. 
+
+		total_energy = 0
+
+		# Iterate over every element in the array.
+		for i in range(self.L):
+			for j in range(self.L):
+				for nn_index in self.nn([i, j]):
+					# For each nearest neighbor of index [i, j]
+					total_energy += self.a[i, j] * self.a[nn_index]
+
+		# Add the external magnetic field influence 
+		if H:
+			total_energy += H * np.sum(self.a)
+		
+		# Return negative sum
+		return -total_energy
+
+	def energy_exp(self, H = 0):
+		"""
+		Energy expectation value.
+
+		Args:
+			H (float, optional): External magnetic field. Defaults to 0.
+
+		Returns:
+			float: Energy expectation value.
+		"""
+		return self.energy(H) / self.N
+
+	def S(self):
+		"""
+		Net Magnetization
+
+		Sum of all spin states in array.
+		"""
+		return np.sum(self.a)
+
+	def S_exp(self):
+		"""
+		Magnetization expectation value. 
+		"""
+		return self.S / self.N
+
+	def U(self):
+		"""
+		Mean Internal Energy
+		"""
+		return self.energy_exp() / self.N
+
+	def M(self):
+		"""
+		Magnetization
+		"""
+		return self.S_exp() / self.N
+
+	def C(self):
+		"""
+		Specific Heat
+		"""
+		pass
+
+	def MS(self):
+		"""
+		Magnetic Susceptibility
+		"""
+		pass
+
