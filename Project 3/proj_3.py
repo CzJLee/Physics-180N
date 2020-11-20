@@ -104,6 +104,10 @@ class Ising_2d:
 		# Init lattice matrix. Lets call this a. Set all spins to be aligned. 
 		self.a = np.ones((L, L))
 
+		# Init Energy (E) and Net Magnetization (S)
+		self.E = self.energy(self.H)
+		self.S = self.spin()
+
 		# Init expectaton values 
 		self.E_exp = 0
 		self.S_exp = 0
@@ -203,9 +207,21 @@ class Ising_2d:
 		
 		# Return negative sum
 		return -total_energy
+	
+	def update_E(self, index, H = 0):
+		"""
+		Update self.E by applying 𝚫E
 
-	def E(self, H = 0):
-		return self.energy(H)
+		Returns:
+			float: Energy.
+		"""
+		del_energy = H
+		for nn_index in self.nn(index):
+			del_energy += self.a[nn_index]
+		del_energy *= 2 * self.a[index]
+
+		# Update E
+		self.E += del_energy
 
 	def update_E_exp(self, n):
 		"""
@@ -223,13 +239,25 @@ class Ising_2d:
 
 		return self.E_exp, self.E_squared_exp
 
-	def S(self):
+	def spin(self):
 		"""
-		Net Magnetization
+		Net Magnetization (S)
 
 		Sum of all spin states in array.
 		"""
 		return np.sum(self.a)
+
+	def update_S(self, index):
+		"""
+		Update self.S by applying 𝚫S
+
+		Returns:
+			float: Energy.
+		"""
+		del_S = 2 * self.a[index]
+
+		# Update S
+		self.S += del_S
 
 	def update_S_exp(self, n):
 		"""
@@ -242,8 +270,8 @@ class Ising_2d:
 			float, float: Magnetization expectation value. Magnetization squared expectaton value
 		"""
 		# Based on <O>_n+1 equation in lab proj_3_instructions
-		self.S_exp += (1 / n) * (self.S() - self.S_exp)
-		self.S_squared_exp += (1 / n) * ((self.S()) ** 2 - self.S_squared_exp)
+		self.S_exp += (1 / n) * (self.spin() - self.S_exp)
+		self.S_squared_exp += (1 / n) * ((self.spin()) ** 2 - self.S_squared_exp)
 
 		return self.S_exp, self.S_squared_exp
 
