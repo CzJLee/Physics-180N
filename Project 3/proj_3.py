@@ -140,26 +140,6 @@ class Ising_2d:
 			dict: Returns a dict with keys as the strings in calculate, and values as a list of values for each step. The list has length num_steps + 1, where the zero'th index is the state before any steps are calculated. 
 		"""
 
-		# if calculate is not None:
-		# 	if isinstance(calculate, str):
-		# 		# If calculate is only one string instead of a list, convert that one item to a set of length 1. 
-		# 		calculate = {calculate}
-
-		# 	# Eliminate items in calculate that are not valid options
-		# 	valid_items = set()
-		# 	for item in calculate:
-		# 		if item in {"E", "S", "U", "M", "MS", "C"}:
-		# 			valid_items.add(item)
-		# 	calculate = valid_items
-
-		# # Init dict of calculated items with empty lists
-		# if calculate:
-		# 	vals = {}
-		# 	if "E" in calculate:
-		# 		pass
-		# 	if "S" in calculate:
-		# 		pass
-
 		if calculate_vals:
 			vals = {}
 			# Init vals dict with keys "E", "S", "U", "M", "MS", and "C".
@@ -170,7 +150,8 @@ class Ising_2d:
 			vals["MS"] = [self.MS()]
 			vals["C"] = [self.C()]
 
-		while num_steps > 0:
+		n = 1
+		while n <= num_steps:
 			# Pick a random site i on the 2D lattice and compute the energy change 𝚫E due to the change of sign in s_i
 			rand_site = tuple(np.random.randint(self.L, size = 2))
 			del_energy = self.H
@@ -182,6 +163,11 @@ class Ising_2d:
 			if del_energy <= 0:
 				# Spin flip accepted, flip spin of rand_site
 				self.a[rand_site] = -1 * self.a[rand_site]
+
+				# Only update E and S if the state changes. 
+				if calculate_vals:
+					self.update_E(rand_site)
+					self.update_S(rand_site)
 			else:
 				# Accept the move with probability A = exp(-𝚫E/T)
 				P_A = math.exp(-del_energy / self.T)
@@ -189,13 +175,30 @@ class Ising_2d:
 				if random.random() < P_A:
 					# Spin flip accepted, flip spin of rand_site
 					self.a[rand_site] = -1 * self.a[rand_site]
+
+					# Only update E and S if the state changes. 
+					if calculate_vals:
+						self.update_E(rand_site)
+						self.update_S(rand_site)
 				else:
 					# Spin flip is rejected, nothing changes. 
 					pass
 
-			num_steps -= 1
+			# Update values. These update regardless of whether spin state changed. 
+			if calculate_vals:
+					self.update_E_exp(n)
+					self.update_S_exp(n)
+					vals["E"].append(self.E)
+					vals["S"].append(self.S)
+					vals["U"].append(self.U())
+					vals["M"].append(self.M())
+					vals["MS"].append(self.MS())
+					vals["C"].append(self.C())
 
-		# return ??? Idk what I am supposed to return here. A list of spins flipped? 
+			n += 1
+
+		if calculate_vals:
+			return vals
 
 	# Use class methods to calculate values
 
