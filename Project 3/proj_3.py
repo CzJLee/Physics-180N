@@ -71,20 +71,6 @@ def weighted_die(num_steps):
 
 	return winnings, results
 
-def two_dim_ising(L, temp, num_steps):
-	"""
-	Simulate the 2-d ising model on a square, periodic lattice of a specified side length L.
-
-	Args:
-		L (int): Side length of lattice. Number of spins.
-		temp (float): Temperature of the lattice.
-		num_steps (int): Number of MCMC steps to perform
-
-	Returns:
-		[type]: [description]
-	"""
-
-	return blah
 
 class Ising_2d:
 	def __init__(self, L, temp, H = 0):
