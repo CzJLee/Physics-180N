@@ -71,7 +71,6 @@ def weighted_die(num_steps):
 
 	return winnings, results
 
-
 class Ising_2d:
 	def __init__(self, L, temp, H = 0):
 		# Critical temperature = 2.2692
@@ -331,6 +330,3 @@ class Ising_2d:
 		Specific Heat
 		"""
 		return (self.E_squared_exp - (self.E_exp) ** 2) / (self.N * (self.T ** 2))
-
-	
-
