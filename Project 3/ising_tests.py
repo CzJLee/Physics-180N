@@ -1,17 +1,23 @@
 from proj_3 import Ising_2d, weighted_die
 import numpy as np
+import matplotlib.pyplot as plt
 
-# model = Ising_2d(4, 2)
+num_steps = 100000
+L = 16
+time_step_size = num_steps / (L ** 2)
+
+# Set temperature to be 3. This is larger than the critical temperature. 
+temp = 3
+
+# Create our Ising model using L = 16, temp = 3.
+model = Ising_2d(L, temp)
 # model.set_rand_state()
-# print(model)
-# print(model.energy())
 
-# l = np.zeros((16, 16))
+# Let's run the MCMC for multiple steps, and calculate values for U and M for each step. 
+vals = model.mcmcm(num_steps, calculate_vals = True)
 
-# a = np.random.randint(16, size = 2)
-# print(a)
-# print(l[tuple(a)])
+# Now lets create our list of time steps to plot
+time_steps = [time_step_size * i for i in range(1, num_steps + 1)]
 
-
-w, r = weighted_die(1000000)
-print(w/1000000)
+plt.plot(time_steps, vals["M"][1::])
+plt.show()
