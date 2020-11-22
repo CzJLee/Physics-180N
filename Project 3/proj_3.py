@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import matplotlib.pyplot as plt
 
 def weighted_die(num_steps):
 	"""
@@ -113,13 +114,21 @@ class Ising_2d:
 		self.E = self.energy()
 		self.S = self.spin()
 
-	def mcmcm(self, num_steps, calculate_vals = False, verbose = False):
+	def set_temp(self, temp):
+		self.T = temp
+
+	def mcmcm(self, num_steps, calculate_vals = False, verbose = False, converge_stop = False, converge_value = "U", converge_range = 0.25, converge_threshold = 0.01):
 		"""
 		Metropolis Algorithm for Ising Model on a square lattice.
 
 		Args:
 			num_steps (int): Number of spin configurations. num_steps >= 1.
 			calculate_vals (bool): If True, calculate and return a dict of vals with keys "E", "S", "U", "M", "MS", and "C".
+			verbose (bool): If True, print the current step progress
+			converge_stop (bool): If True, end simulation after converge_value is within converge_threshold. 
+			converge_value (string): The value to check convergence on. Options are "E", "S", "U", "M", "MS", and "C".
+			converge_range (float): Value between 0 and 1. Percent of most recent calculated values to check convergence against. 
+			converge_threshold (float): Min and Max values within converge_range must be within threshold to declare convergence. 
 
 		Returns: 
 			dict: Returns a dict with keys as the strings in calculate, and values as a list of values for each step. The list has length num_steps, where the n'th index is the state AFTER the n'th step. 
@@ -182,6 +191,17 @@ class Ising_2d:
 					vals["M"].append(self.M())
 					vals["MS"].append(self.MS())
 					vals["C"].append(self.C())
+
+			# Check convergence condition. Only check every 1% of num_steps to speed up simulation.
+			if converge_stop and n%(num_steps/100) == 0:
+				# Get range of values
+				check_vals = vals[converge_value][int( (1 - converge_range) * n )::]
+				# Find min and max
+				vals_max = max(check_vals)
+				vals_min = min(check_vals)
+				diff = abs(vals_max - vals_min)
+				if diff < converge_threshold:
+					break
 
 			n += 1
 
@@ -333,3 +353,10 @@ class Ising_2d:
 		Specific Heat
 		"""
 		return (self.E_squared_exp - (self.E_exp) ** 2) / (self.N * (self.T ** 2))
+
+	def show_state(self):
+		"""
+		Show heatmap plot of current spin states
+		"""
+		plt.imshow(self.a, cmap='Greys', interpolation='nearest')
+		plt.show()
