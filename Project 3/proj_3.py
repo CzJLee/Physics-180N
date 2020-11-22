@@ -113,7 +113,7 @@ class Ising_2d:
 		self.E = self.energy()
 		self.S = self.spin()
 
-	def mcmcm(self, num_steps, calculate_vals = False):
+	def mcmcm(self, num_steps, calculate_vals = False, verbose = False):
 		"""
 		Metropolis Algorithm for Ising Model on a square lattice.
 
@@ -122,21 +122,24 @@ class Ising_2d:
 			calculate_vals (bool): If True, calculate and return a dict of vals with keys "E", "S", "U", "M", "MS", and "C".
 
 		Returns: 
-			dict: Returns a dict with keys as the strings in calculate, and values as a list of values for each step. The list has length num_steps + 1, where the zero'th index is the state before any steps are calculated. 
+			dict: Returns a dict with keys as the strings in calculate, and values as a list of values for each step. The list has length num_steps, where the n'th index is the state AFTER the n'th step. 
 		"""
 
 		if calculate_vals:
 			vals = {}
-			# Init vals dict with keys "E", "S", "U", "M", "MS", and "C".
-			vals["E"] = [self.E]
-			vals["S"] = [self.S]
-			vals["U"] = [self.U()]
-			vals["M"] = [self.M()]
-			vals["MS"] = [self.MS()]
-			vals["C"] = [self.C()]
+			# Init vals dict with empty lists.
+			vals["E"] = []
+			vals["S"] = []
+			vals["U"] = []
+			vals["M"] = []
+			vals["MS"] = []
+			vals["C"] = []
 
 		n = 1
 		while n <= num_steps:
+			if verbose and n%(num_steps/1000) == 0:
+				print(f"Calculating step {n}/{num_steps}", end = "\r")
+
 			# Pick a random site i on the 2D lattice and compute the energy change 𝚫E due to the change of sign in s_i
 			rand_site = tuple(np.random.randint(self.L, size = 2))
 			del_energy = self.H
