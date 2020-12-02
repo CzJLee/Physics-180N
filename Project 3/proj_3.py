@@ -340,7 +340,7 @@ class Ising_2d:
 		"""
 		Magnetization
 		"""
-		return self.S_exp / self.N
+		return abs(self.S_exp) / self.N
 
 	def MS(self):
 		"""
