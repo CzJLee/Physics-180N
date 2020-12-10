@@ -41,7 +41,7 @@ class Diffusion_1D():
 			self.temp = np.append(self.temp, np.empty(((self.l // self.h) + 1, 1)), axis = 1)
 
 
-			if self.bc_left:
+			if self.bc_left is not None:
 				# If there is a left boundary condition
 				# Set that position to be equal to the bc
 				self.temp[0, n + 1] = self.bc_left
@@ -49,7 +49,7 @@ class Diffusion_1D():
 				# BC is set to None, no BC, apply modified equation 5
 				self.temp[0, n + 1] = self.temp[0, n] + self.b * (self.temp[1, n] - self.temp[0, n])
 
-			if self.bc_right:
+			if self.bc_right is not None:
 				# If there is a right boundary condition
 				# Set that position to be equal to the bc
 				self.temp[-1, n + 1] = self.bc_right
@@ -57,7 +57,7 @@ class Diffusion_1D():
 				# BC is set to None, no BC, apply modified equation 5
 				self.temp[-1, n + 1] = self.temp[-1, n] + self.b * (self.temp[-2, n] - self.temp[-1, n])
 
-			for m in range (1, int(self.l // self.h)):
+			for m in range(1, int(self.l // self.h)):
 				self.temp[m, n + 1] = self.temp[m, n] + self.b * (self.temp[m + 1, n] + self.temp[m - 1, n] - 2 * self.temp[m, n])
 
 	def get_temp_at_time(self, n):
@@ -67,10 +67,10 @@ model = Diffusion_1D()
 model.set_boundary_conditions()
 model.simulate_diffusion()
 # print(model.dt)
-# print(model.temp)
+print(model.temp)
 # print(model.time)
 
-n = int(30.2 // model.dt)
+n = int(75 // model.dt)
 blah = model.get_temp_at_time(n)
 print(blah)
 
