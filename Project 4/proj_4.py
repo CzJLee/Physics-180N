@@ -80,13 +80,27 @@ class Diffusion_1D():
 	def get_temp_at_time(self, n):
 		return self.temp[:, n]
 
+	def plot_temp_at_time(self, time):
+		# Get the index of the given time
+		times = [int(t // self.dt) for t in time]
+
+		# Get the column of temp data at the given time index
+		temp_at_time = [self.get_temp_at_time(n) for n in times]
+
+		# Plot
+		for temp in temp_at_time:
+			plt.plot(model.length, temp)
+
+		plt.xlabel("Length (cm)")
+		plt.ylabel('Temperature (°C)')
+		plt.title('Temperature distribution at various times')
+
+		# Convert times into list of times
+		time_str = [f"{t} s" for t in time]
+		plt.legend(time_str, loc = "upper right")
+		plt.show()
+
 model = Diffusion_1D()
 model.set_boundary_conditions()
 model.simulate_diffusion()
-
-
-n = int(75 // model.dt)
-blah = model.get_temp_at_time(n)
-
-plt.plot(model.length, blah)
-plt.show()
+model.plot_temp_at_time([0, 10, 30, 60, 75])
