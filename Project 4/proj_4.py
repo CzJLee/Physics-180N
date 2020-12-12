@@ -125,10 +125,11 @@ class Diffusion_1D():
 		plt.show()
 
 class Diffusion_3D(Diffusion_1D):
-	def __init__(self, a = (1.10407 ** 0.5), l = 25, b = 1/6, h = 1, t_max = 120):
+	def __init__(self, a = (1.10407 ** 0.5), l = 25, b = 1/6, h = 1, t_max = 180):
 		super().__init__(a = a, l = l, b = b, h = h, t_max = t_max)
 
 	def set_boundary_conditions(self, temp = 100, bc_right = 0):
+		self.bc_left = 0
 		self.bc_right = bc_right
 
 		# Create an array with length = (l // h) + 1 
@@ -157,34 +158,6 @@ class Diffusion_3D(Diffusion_1D):
 		C     = (x2 * x3 * (x2-x3) * y1+x3 * x1 * (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / denom
 
 		return A,B,C
-
-	def simulate_diffusion(self):
-		# This differs from 1D in that the center is not calculated, and instead approximated from the neighbor points
-		# Array and code is formatted to match notation of equation (5)
-		# For each time step, apply equation (5) and store results as a new entry in self.temp
-		for n in range(self.n_max):
-			# Iterate over all time steps
-			# Append an empty column to right of temp for next time step
-			self.temp = np.append(self.temp, np.empty((self.m_max, 1)), axis = 1)
-
-			if self.bc_right is not None:
-				# If there is a right boundary condition
-				# Set that position to be equal to the bc
-				self.temp[-1, n + 1] = self.bc_right
-			else:
-				# BC is set to None, no BC, apply modified equation 5
-				self.temp[-1, n + 1] = self.temp[-1, n] + self.b * (self.temp[-2, n] - self.temp[-1, n])
-
-			# Apply equation (5) to each non-edge length segment.
-			for m in range(1, self.m_max - 1):
-				# Iterate over all inner length segments
-				self.temp[m, n + 1] = self.temp[m, n] + self.b * (self.temp[m + 1, n] + self.temp[m - 1, n] - 2 * self.temp[m, n])
-
-			# Then best fit the point for m = 0
-			y1, y2, y3 = self.temp[1:4, n + 1]
-			x1, x2, x3 = self.length[1:4]
-			a, b, c = self.calc_parabola(x1, y1, x2, y2, x3, y3)
-			self.temp[0, n + 1] = 0
 
 	def radial_transform(self, temps):
 		# As described below equation (7), to convert from 1D back to 3D sphere
@@ -226,4 +199,3 @@ sphere.simulate_diffusion()
 sphere.convert_temp_to_radial()
 sphere.plot_temp_at_time([0, 30.2, 60.4, 90.6, 120.8, 151])
 sphere.plot_animate()
-# print(sphere.temp)
