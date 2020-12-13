@@ -184,18 +184,3 @@ class Diffusion_3D(Diffusion_1D):
 		
 		# Apply change to temp variable
 		self.temp = np.array(conv_temp).T
-
-
-# model = Diffusion_1D()
-# model.set_boundary_conditions()
-# model.simulate_diffusion()
-# model.plot_temp_at_time([0, 15.1, 30.2, 45.3, 60.4, 75.5])
-
-# model.plot_animate()
-
-sphere = Diffusion_3D(t_max = 180)
-sphere.set_boundary_conditions(temp = 100, bc_right = 0)
-sphere.simulate_diffusion()
-sphere.convert_temp_to_radial()
-sphere.plot_temp_at_time([0, 30.2, 60.4, 90.6, 120.8, 151])
-sphere.plot_animate()
