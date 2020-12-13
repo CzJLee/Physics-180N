@@ -101,7 +101,7 @@ class Diffusion_1D():
 		plt.legend(time_str, loc = "upper right")
 		plt.show()
 
-	def plot_animate(self):
+	def plot_animate(self, object_name = "1D bar"):
 		# Draw animated plot over the time period
 		fig, ax = plt.subplots()
 		# Set axis bounds
@@ -116,7 +116,7 @@ class Diffusion_1D():
 
 		def animate(i):
 			line.set_ydata(T[:, i])
-			ax.set_title(f"Temperature distribution of 1D bar at various times\nTime: {i * self.dt :.2f} s")
+			ax.set_title(f"Temperature distribution of {object_name} at various times\nTime: {i * self.dt :.2f} s")
 
 		anim = FuncAnimation(
 			fig, animate, interval=10, frames=self.n_max)
