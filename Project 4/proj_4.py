@@ -81,7 +81,7 @@ class Diffusion_1D():
 	def get_temp_at_time(self, n):
 		return self.temp[:, n]
 
-	def plot_temp_at_time(self, time):
+	def plot_temp_at_time(self, time, object_name = "1D bar"):
 		# Get the index of the given time
 		times = [int(t // self.dt) for t in time]
 
@@ -94,7 +94,7 @@ class Diffusion_1D():
 
 		plt.xlabel("Length (cm)")
 		plt.ylabel("Temperature (°C)")
-		plt.title("Temperature distribution of 1D bar at various times")
+		plt.title(f"Temperature distribution of {object_name} at various times")
 
 		# Convert times into list of times
 		time_str = [f"{t} s" for t in time]
